@@ -1,32 +1,33 @@
 # ART SAFE PLACE
 
-Веб-приложение для музыкантов и артистов СНГ. Помогает вести творческий путь от демо до релиза: управление треками, поиск специалистов, обучение и цифровая идентичность артиста.
+`ART SAFE PLACE` — веб-продукт для артиста, построенный вокруг двух опор:
+`Мир артиста` и `Путь артиста`.
 
-## Технологии
+Идея продукта: карьера артиста — это не только песни. Это система из смысла, образа, аудитории, контента, людей, execution-ритма и долгого вектора. Система не убивает творчество, а даёт ему структуру, устойчивость и масштаб.
 
-- **Frontend:** Next.js 14 (App Router), React 18, TypeScript
-- **UI:** TailwindCSS
-- **Backend:** Route handlers (Next.js API), Prisma ORM
-- **БД:** PostgreSQL
-- **Аутентификация:** NextAuth (Credentials, JWT)
-- **Валидация:** Zod
-- **Data fetching:** @tanstack/react-query
+## Что есть в продукте
 
-## Структура проекта
+- `/id` — `Мир артиста` и `SAFE ID`
+- `/today` — `Путь артиста`, приоритеты и daily-ритм
+- `/songs` — музыкальный workspace: треки, демо, проекты
+- `/find` — поиск людей, сессий и услуг
+- `/learn` — контекстное обучение
+- `/community` — окружение, обратная связь и accountability
+- `/assistant` — отложенная поверхность, не ядро phase 1
 
-```
-├── src/
-│   ├── app/          # Страницы и API routes
-│   ├── components/   # UI и feature-компоненты
-│   ├── lib/          # Сервисы, хелперы, доменная логика
-│   └── contracts/    # Схемы и контракты
-├── prisma/           # Схема БД, миграции, seed
-├── docs/             # Документация проекта
-├── scripts/          # Служебные скрипты
-└── uploads/          # Локальное хранилище аудио
-```
+## Актуальный first-time flow
 
-## Установка и запуск
+Для нового пользователя вход сейчас устроен так:
+
+1. Регистрация на `/signup` по `e-mail + пароль`
+2. Визуальная анкета на `/welcome`
+3. Одноразовый гайд по `Today -> Songs -> Find -> ID`
+4. Возврат на `/today` с приоритетом на `Мир артиста`
+5. Дальше пользователь уже двигается по основным поверхностям продукта
+
+Важно: старые пользователи не должны насильно выбрасываться в новый flow, если у них нет новой onboarding-state записи.
+
+## Быстрый запуск
 
 ### 1. Установить зависимости
 
@@ -34,68 +35,107 @@
 npm install
 ```
 
-### 2. Настроить окружение
+### 2. Подготовить окружение
 
 ```bash
 cp .env.example .env
 ```
 
-Заполнить переменные в `.env`:
-- `DATABASE_URL` — строка подключения к PostgreSQL
-- `NEXTAUTH_URL` — URL приложения (по умолчанию `http://localhost:3000`)
-- `NEXTAUTH_SECRET` — секрет для JWT-сессий
+По умолчанию приложение ждёт PostgreSQL на:
 
-### 3. Запустить базу данных
+```env
+DATABASE_URL=postgresql://artsafe:artsafe@localhost:5432/artsafehub
+```
+
+### 3. Поднять базу
 
 ```bash
 docker-compose up -d db
 ```
 
-### 4. Применить миграции и seed-данные
+### 4. Применить миграции и сид
 
 ```bash
-npm run prisma:migrate
+npx prisma migrate deploy
 npm run prisma:seed
 ```
 
-### 5. Запустить dev-сервер
+Для локальной разработки также можно использовать:
+
+```bash
+npm run prisma:migrate
+```
+
+### 5. Запустить dev server
 
 ```bash
 npm run dev
 ```
 
-Приложение будет доступно по адресу `http://localhost:3000`.
+## Демо-доступ
 
-## Скрипты
+- `Email:` `demo@artsafehub.app`
+- `Password:` `demo1234`
 
-| Команда               | Описание                          |
-|-----------------------|-----------------------------------|
-| `npm run dev`         | Запуск dev-сервера                |
-| `npm run build`       | Сборка проекта                    |
-| `npm run lint`        | Проверка кода (ESLint)            |
-| `npm run typecheck`   | Проверка типов (TypeScript)       |
-| `npm run docs`        | Генерация документации (TypeDoc)  |
-| `npm run prisma:migrate` | Применение миграций БД         |
-| `npm run prisma:seed`    | Заполнение БД тестовыми данными|
+## Полезные команды
 
-## Документация
-
-API-документация генерируется из JSDoc-комментариев в коде с помощью [TypeDoc](https://typedoc.org/):
+### Смена PATH stage у demo-профиля
 
 ```bash
-npm run docs
+npm run demo:stage -- <stageOrder|stageName> [email]
 ```
 
-Результат сохраняется в директорию `docs/api/`.
-
-## Docker
-
-Запуск всего стека (приложение + БД):
+Примеры:
 
 ```bash
-docker-compose up --build
+npm run demo:stage -- 2
+npm run demo:stage -- "Искра"
+npm run demo:stage -- 4 user@example.com
 ```
 
-## Лицензия
+### Очистить demo-профиль
 
-Проект разработан в рамках дисциплины «Технологии разработки программных приложений» (РТУ МИРЭА).
+```bash
+npm run demo:reset
+```
+
+### Очистить профильные данные у всех аккаунтов
+
+Сохраняются сами аккаунты, `email` и `password`, но очищаются профили, треки, onboarding-state и связанный пользовательский контент.
+
+```bash
+npm run profiles:reset
+```
+
+## Проверки
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+## Технологии
+
+- Next.js 14 (App Router) + TypeScript
+- TailwindCSS
+- Prisma ORM + PostgreSQL
+- NextAuth Credentials
+- TanStack Query
+
+## Куда смотреть в коде
+
+- shell и навигация: `src/components/layout/app-shell.tsx`
+- корневой вход и redirect-логика: `src/app/page.tsx`
+- onboarding state и guide flow: `src/lib/entry-flow.ts`
+- визуальная анкета: `src/app/welcome/page.tsx`
+- home overview API: `src/app/api/home/overview/route.ts`
+- `Мир артиста`: `src/app/id/page.tsx`, `src/app/api/id/route.ts`, `src/lib/artist-world.ts`
+
+## Важно помнить
+
+- Это web-first продукт.
+- `AI ASSIST` не является центральной поверхностью phase 1.
+- В UI важны формулировки `Мир артиста` и `Путь артиста`, даже если технические URL пока короче.
+- Если локально падает Prisma с `Can't reach database server at localhost:5432`, почти всегда сначала нужно проверить, что поднят `docker-compose` и жив контейнер `db`.
