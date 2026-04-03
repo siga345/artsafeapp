@@ -379,6 +379,20 @@ enum TrackDecisionType {
   REFLECTION_CAPTURED
 }
 
+enum AiRecommendationType {
+  LEARN
+  EVENT
+  CREATOR
+  REFERENCE_ARTIST
+  TASK
+}
+
+enum ChatMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
 model User {
   id                   String             @id @default(cuid())
   safeId               String             @unique @default(cuid())
@@ -434,6 +448,10 @@ model User {
   recommendationEvents RecommendationEvent[]
   trackDecisions       TrackDecision[]
   learnApplications    LearnApplication[]
+  aiRecommendations    AiRecommendation[]
+  aiTaskRationales     AiTaskRationale[]
+  chatSessions         ChatSession[]
+  artistExternalContext ArtistExternalContext?
 }
 
 model SpecialistProfile {
@@ -1377,4 +1395,131 @@ model LearnMaterial {
 
   @@index([isFeatured, sortOrder])
   @@index([type])
+}
+
+// =============================================
+// AI Personalization Models
+// =============================================
+
+model AiRecommendation {
+  id        String               @id @default(uuid())
+  userId    String
+  type      AiRecommendationType
+  targetId  String?
+  title     String
+  reason    String
+  relevance Float
+  category  String?
+  isActive  Boolean              @default(true)
+  createdAt DateTime             @default(now())
+  expiresAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, isActive])
+  @@index([userId, relevance])
+}
+
+model AiTaskRationale {
+  id        String        @id @default(uuid())
+  userId    String
+  taskId    String?
+  messageId String?
+  taskTitle String
+  rationale String
+  priority  TaskPriority?
+  category  String?
+  relatedUrl String?
+  createdAt DateTime      @default(now())
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message ChatMessage? @relation(fields: [messageId], references: [id])
+
+  @@index([userId])
+  @@index([taskId])
+}
+
+// =============================================
+// AI Chat Models
+// =============================================
+
+model ChatSession {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String?
+  isActive  Boolean  @default(true)
+  summary   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@index([userId, isActive])
+  @@index([userId, updatedAt])
+}
+
+model ChatMessage {
+  id        String          @id @default(uuid())
+  sessionId String
+  role      ChatMessageRole
+  content   String
+  metadata  Json?
+  createdAt DateTime        @default(now())
+
+  session    ChatSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  rationales AiTaskRationale[]
+
+  @@index([sessionId, createdAt])
+}
+
+// =============================================
+// External Context (Фаза 4)
+// =============================================
+
+model ArtistExternalContext {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  spotifyUrl      String?
+  appleMusicUrl   String?
+  yandexMusicUrl  String?
+  instagramUrl    String?
+  tiktokUrl       String?
+  vkUrl           String?
+  telegramUrl     String?
+  youtubeUrl      String?
+  geniusUrl       String?
+
+  extractedBio              String?
+  extractedGenres           String[]
+  extractedMonthlyListeners Int?
+  extractedTopTracks        Json?
+
+  lastSyncAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// =============================================
+// Reference Artists (Фаза 3)
+// =============================================
+
+model ReferenceArtist {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  aestheticTags String[]
+  genres        String[]
+  spotifyUrl    String?
+  instagramUrl  String?
+  youtubeUrl    String?
+  imageUrl      String?
+  whyRelevant   String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@index([isActive])
 }

@@ -280,7 +280,7 @@ const versionTypeLabels: Record<DemoVersionType, string> = {
   DEMO: "Демо",
   ARRANGEMENT: "Продакшн",
   NO_MIX: "Запись без сведения",
-  MIXED: "Со сведением",
+  MIXED: "С сведением",
   MASTERED: "С мастерингом",
   RELEASE: "Релиз"
 };
@@ -2882,7 +2882,7 @@ export default function SongDetailPage({ params }: { params: { id: string } }) {
                   <option value="DEMO">Демо</option>
                   <option value="ARRANGEMENT">Продакшн</option>
                   <option value="NO_MIX">Запись без сведения</option>
-                  <option value="MIXED">Со сведением</option>
+                  <option value="MIXED">С сведением</option>
                   <option value="MASTERED">С мастерингом</option>
                   <option value="RELEASE">Релиз</option>
                 </Select>

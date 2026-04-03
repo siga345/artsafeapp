@@ -1,5 +1,6 @@
 import { getAiRuntimeConfig } from "@/lib/ai/config";
 import { MockStructuredAiProvider } from "@/lib/ai/mock-structured-provider";
+import { OpenAiProvider } from "@/lib/ai/openai-provider";
 
 export type NavigationCandidateForAI = {
   specialistUserId: string;
@@ -80,6 +81,9 @@ export function getStructuredAiProvider(): StructuredAiProvider {
 
   const config = getAiRuntimeConfig();
   switch (config.provider) {
+    case "openai":
+      cachedProvider = new OpenAiProvider();
+      return cachedProvider;
     case "mock":
     default:
       cachedProvider = new MockStructuredAiProvider(config.navigationModel, config.supportModel);

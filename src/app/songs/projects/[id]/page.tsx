@@ -1949,7 +1949,7 @@ export default function SongProjectPage({ params }: { params: { id: string } }) 
                 <option value="DEMO">Демо</option>
                 <option value="ARRANGEMENT">Продакшн</option>
                 <option value="NO_MIX">Запись без сведения</option>
-                <option value="MIXED">Со сведением</option>
+                <option value="MIXED">С сведением</option>
                 <option value="MASTERED">С мастерингом</option>
                 <option value="RELEASE">Релиз</option>
                 <option value="IDEA_TEXT">Идея</option>
